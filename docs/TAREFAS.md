@@ -9,14 +9,14 @@ Explicação de cada frente: [FRENTES.md](FRENTES.md). Fluxo de trabalho e crono
 - [ ] docker-compose.yml base: rede, restart, variáveis de ambiente
 - [ ] .env.example atualizado
 
-## Frente B: Métricas e dashboards (1,00): responsável: ____
+## Frente B: Métricas e dashboards (1,00): responsável: Lucas
 - [ ] cAdvisor no compose
 - [ ] Prometheus: prometheus.yml (alvos e intervalo) + volume
 - [ ] Grafana: datasource Prometheus + volume
 - [ ] Dashboard próprio: CPU, RAM, rede in/out, estado do container
 - [ ] Saber explicar cada query PromQL
 
-## Frente C: Disponibilidade, alertas e testes (1,00): responsável: ____
+## Frente C: Disponibilidade, alertas e testes (1,00): responsável: Wolfgang
 - [ ] Uptime Kuma no compose + volume
 - [ ] Monitor HTTP (intervalo e timeout definidos)
 - [ ] Notificação no Discord (queda e recuperação), sem expor o webhook

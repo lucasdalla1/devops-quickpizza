@@ -19,8 +19,8 @@ O trabalho foi dividido em três frentes, que correspondem às camadas desse amb
 | Frente | Responsável | Critérios de avaliação | Pontos |
 |---|---|---|---|
 | A: Aplicação e orquestração | Ricardo | Conteinerização + Docker Compose | 0,80 |
-| B: Métricas e dashboards | a definir | Prometheus/cAdvisor + Grafana | 1,00 |
-| C: Disponibilidade, alertas e testes | a definir | Uptime Kuma + Discord + Cenários | 1,00 |
+| B: Métricas e dashboards | Lucas | Prometheus/cAdvisor + Grafana | 1,00 |
+| C: Disponibilidade, alertas e testes | Wolfgang | Uptime Kuma + Discord + Cenários | 1,00 |
 | Todos | equipe | Documentação, repositório e organização | 0,20 |
 
 A nota considera a capacidade de **cada integrante** explicar os componentes. Todos devem entender as três frentes, não só a própria.
