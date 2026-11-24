@@ -6,8 +6,10 @@ Projeto final da disciplina DevOps Tools (UVV), prof. Renato Sousa Botacim.
 | Integrante | GitHub | Frente |
 |---|---|---|
 | Lucas | @lucasdalla1 | |
-| Ricardo | | |
+| Ricardo | | A: Aplicação e orquestração |
 | Wolfgang | | |
+
+Organização da equipe: [frentes de trabalho](docs/FRENTES.md), [tarefas](docs/TAREFAS.md) e [como contribuir](docs/CONTRIBUINDO.md).
 
 ## Visão geral
 ## Arquitetura
