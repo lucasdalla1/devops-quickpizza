@@ -5,11 +5,11 @@ Projeto final da disciplina DevOps Tools (UVV), prof. Renato Sousa Botacim.
 ## Equipe
 | Integrante | GitHub | Frente |
 |---|---|---|
-| Lucas | @lucasdalla1 | |
+| Lucas | @lucasdalla1 | B: Métricas e dashboards |
 | Ricardo | | A: Aplicação e orquestração |
-| Wolfgang | | |
+| Wolfgang | | C: Disponibilidade, alertas e testes |
 
-Organização da equipe: [frentes de trabalho](docs/FRENTES.md), [tarefas](docs/TAREFAS.md) e [como contribuir](docs/CONTRIBUINDO.md).
+Organização da equipe: [requisitos do projeto](docs/REQUISITOS.md), [frentes de trabalho](docs/FRENTES.md), [tarefas](docs/TAREFAS.md) e [como contribuir](docs/CONTRIBUINDO.md).
 
 ## Visão geral
 ## Arquitetura
