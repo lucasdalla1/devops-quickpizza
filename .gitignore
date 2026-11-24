@@ -1,0 +1,16 @@
+# Segredos (webhook, senhas)
+.env
+.env.*
+!.env.example
+
+# Resultados do JMeter
+jmeter/results/
+jmeter/report/
+*.jtl
+jmeter.log
+
+# Sistema/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
