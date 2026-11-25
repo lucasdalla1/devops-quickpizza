@@ -2,6 +2,18 @@ global:
   scrape_interval: 5s # intervalo de tempo de coleta do Prometheus
 
 scrape_configs:
+  # métricas de infraestrutura dos containers (CPU, memória, rede)
   - job_name: cadvisor
     static_configs:
       - targets: ["cadvisor:8080"] # endereço do cAdvisor para coleta de métricas
+
+  # métricas da própria aplicação (requisições, status HTTP e tempo de resposta)
+  - job_name: quickpizza
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["quickpizza:3333"]
+
+  # o próprio Prometheus, para verificar se a coleta está saudável
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
