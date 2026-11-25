@@ -23,6 +23,8 @@ O trabalho foi dividido em três frentes, que correspondem às camadas desse amb
 | C: Disponibilidade, alertas e testes | Wolfgang | Uptime Kuma + Discord + Cenários | 1,00 |
 | Todos | equipe | Documentação, repositório e organização | 0,20 |
 
+A **integração** das frentes (Compose final, teste em ambiente limpo e release) fica com o Lucas. Ajustes em cada frente continuam com o respectivo responsável.
+
 A nota considera a capacidade de **cada integrante** explicar os componentes. Todos devem entender as três frentes, não só a própria.
 
 ---
