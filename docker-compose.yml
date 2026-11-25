@@ -1,0 +1,20 @@
+services:
+  quickpizza:
+    build:
+      context: ./app
+    ports:
+      - "127.0.0.1:3333:3333"
+    environment:
+      QUICKPIZZA_OTEL_SERVICE_NAME: "${QUICKPIZZA_OTEL_SERVICE_NAME:-quickpizza}"
+    networks:
+      - monitoring
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 2g
+
+networks:
+  monitoring:
+    name: monitoring
