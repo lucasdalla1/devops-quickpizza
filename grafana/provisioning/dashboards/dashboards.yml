@@ -1,0 +1,10 @@
+# carrega os dashboards da pasta /etc/grafana/dashboards quando o Grafana sobe
+apiVersion: 1
+
+providers:
+  - name: devops-quickpizza
+    folder: DevOps QuickPizza
+    type: file
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/dashboards

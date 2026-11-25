@@ -1,0 +1,13 @@
+# fonte de dados criada automaticamente quando o Grafana sobe
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    uid: prometheus
+    type: prometheus
+    access: proxy # o próprio Grafana consulta o Prometheus pela rede Docker
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+    jsonData:
+      timeInterval: 5s # mesmo intervalo de coleta do prometheus.yml
