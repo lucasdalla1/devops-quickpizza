@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 5s # intervalo de tempo de coleta do Prometheus
+
+scrape_configs:
+  - job_name: cadvisor
+    static_configs:
+      - targets: ["cadvisor:8080"] # endereço do cAdvisor para coleta de métricas
