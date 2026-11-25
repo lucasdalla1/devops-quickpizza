@@ -15,6 +15,77 @@ services:
           cpus: "1.0"
           memory: 2g
 
+  # coleta CPU, memória, rede e estado de cada container
+  cadvisor:
+    image: ghcr.io/google/cadvisor:v0.61.1
+    privileged: true # precisa ler informações do kernel (cgroups)
+    pid: host # enxerga os processos da VM do Docker Desktop
+    devices:
+      - /dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    # no Docker Desktop (WSL), /rootfs aponta para a distro Linux e não para a VM do Docker:
+    # o bind de /proc faz o cAdvisor achar os processos dos containers e ler a rede de cada um.
+    # disk fica desligado por incompatibilidade do cAdvisor com o armazenamento do Docker 29.
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        mount --bind /proc /rootfs/proc &&
+        exec /usr/bin/cadvisor -logtostderr
+        --disable_metrics=disk
+        --containerd=/proc/1/root/run/containerd/containerd.sock
+    ports:
+      - "127.0.0.1:8080:8080"
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+  # busca as métricas do cAdvisor e da aplicação e guarda como séries temporais
+  prometheus:
+    image: prom/prometheus:v3.7.3
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=7d
+    volumes:
+      - ./prometheus:/etc/prometheus:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "127.0.0.1:9090:9090"
+    networks:
+      - monitoring
+    depends_on:
+      - cadvisor
+      - quickpizza
+    restart: unless-stopped
+
+  # dashboards; fonte de dados e painéis são provisionados pelos arquivos em ./grafana
+  grafana:
+    image: grafana/grafana:13.3.2
+    environment:
+      GF_SECURITY_ADMIN_USER: "${GRAFANA_ADMIN_USER:-admin}"
+      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_ADMIN_PASSWORD:-admin}"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/etc/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "127.0.0.1:3000:3000"
+    networks:
+      - monitoring
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
 networks:
   monitoring:
     name: monitoring
+
+volumes:
+  prometheus_data:
+  grafana_data:
