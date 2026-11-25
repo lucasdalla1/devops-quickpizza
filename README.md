@@ -6,7 +6,7 @@ Projeto final da disciplina DevOps Tools (UVV), prof. Renato Sousa Botacim.
 | Integrante | GitHub | Frente |
 |---|---|---|
 | Lucas | @lucasdalla1 | |
-| Ricardo | | |
+| Ricardo | @taliuli10 | |
 | Wolfgang | | |
 
 ## Visão geral

@@ -1,0 +1,81 @@
+import { ReplayInstrumentation } from '@grafana/faro-instrumentation-replay';
+import { getWebInstrumentations, initializeFaro } from '@grafana/faro-web-sdk';
+import { TracingInstrumentation } from '@grafana/faro-web-tracing';
+import { PUBLIC_BACKEND_ENDPOINT } from '$app/env/public';
+
+function setupFaro() {
+	return fetch(`${PUBLIC_BACKEND_ENDPOINT}/api/config`)
+		.then((data) => data.json())
+		.then((config) => {
+			const url = config.faro_url;
+			const faroAppName = config.faro_app_name || 'QuickPizza';
+			const faroAppNamespace = config.faro_app_namespace || 'quickpizza';
+			const faroAppVersion = config.faro_app_version || '1.0.0';
+			const faroAppEnvironment = config.faro_app_environment || 'production';
+			const faroInstrumentationEnableReplay =
+				config.faro_instrumentation_enable_replay === 'true';
+			const faroSessionSamplingRate =
+				parseFloat(config.faro_session_sampling_rate) || 1;
+			const faroReplaySamplingRate =
+				parseFloat(config.faro_replay_sampling_rate) || 1;
+
+			if (!url) {
+				console.warn('Grafana Faro is not configured.');
+			}
+
+			const instrumentations = [
+				// Mandatory, overwriting the instrumentations array would cause the default instrumentations to be omitted
+				...getWebInstrumentations(),
+
+				// Initialization of the tracing package.
+				// This packages is optional because it increases the bundle size noticeably. Only add it if you want tracing data.
+				new TracingInstrumentation(),
+			];
+
+			if (faroInstrumentationEnableReplay) {
+				instrumentations.push(
+					new ReplayInstrumentation({
+						maskAllInputs: false,
+						maskInputOptions: {
+							password: true,
+							email: true,
+						},
+						// Override Faro's '*' default without changing password/email input masking.
+						maskTextSelector: undefined,
+						collectFonts: true,
+						inlineImages: true,
+						inlineStylesheet: true,
+						samplingRate: faroReplaySamplingRate,
+					}),
+				);
+			}
+
+			console.log(`Initializing Grafana Faro to '${url}'`);
+			initializeFaro({
+				url,
+				requestCompression: true,
+				app: {
+					name: faroAppName,
+					namespace: faroAppNamespace,
+					version: faroAppVersion,
+					environment: faroAppEnvironment,
+				},
+				sessionTracking: {
+					samplingRate: faroSessionSamplingRate,
+				},
+				instrumentations,
+			});
+		})
+		.catch((e) => {
+			console.error('Cannot read config from backend');
+			console.error(e.message);
+		});
+}
+
+// SvelteKit awaits `init` before mounting the app or running any route `load` functions,
+// so this guarantees Faro's TracingInstrumentation has patched fetch/XHR before the app
+// issues its own requests (e.g. admin login, tools, quotes). The /api/config request
+// itself can never be traced, since it's what delivers Faro's own collector URL.
+export async function init() {
+	await setupFaro();
+}

@@ -1,0 +1,61 @@
+package database
+
+import (
+	"database/sql"
+	"fmt"
+	"os"
+	"runtime"
+	"strings"
+
+	"log/slog"
+
+	"github.com/grafana/quickpizza/pkg/logging"
+	"github.com/grafana/quickpizza/pkg/otel"
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/pgdialect"
+	"github.com/uptrace/bun/dialect/sqlitedialect"
+	"github.com/uptrace/bun/driver/pgdriver"
+	"github.com/uptrace/bun/driver/sqliteshim"
+	"github.com/uptrace/bun/extra/bunotel"
+)
+
+// initializeDB opens the database connection and registers query hooks. The bunotel OTel
+// query hook is only added when otel.InstrumentDatabase() reports true (false in "obi" mode,
+// see its doc comment for why). The slog logging hook is unconditional; it isn't part of the
+// OTel/OBI split.
+func initializeDB(connString string) (*bun.DB, error) {
+	var db *bun.DB
+	if strings.HasPrefix(connString, "postgres://") {
+		sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(connString)))
+		maxOpenConns := 4 * runtime.GOMAXPROCS(0)
+		sqldb.SetMaxOpenConns(maxOpenConns)
+		sqldb.SetMaxIdleConns(maxOpenConns)
+		err := sqldb.Ping()
+		if err != nil {
+			return nil, fmt.Errorf("connecting to postgresql: %w", err)
+		}
+		db = bun.NewDB(sqldb, pgdialect.New())
+	} else {
+		sqldb, err := sql.Open(sqliteshim.ShimName, connString)
+		if err != nil {
+			return nil, err
+		}
+		db = bun.NewDB(sqldb, sqlitedialect.New())
+		_, err = db.Exec("PRAGMA foreign_keys = ON")
+		if err != nil {
+			return nil, err
+		}
+	}
+	dbName, ok := os.LookupEnv("QUICKPIZZA_OTEL_DB_NAME")
+	if !ok {
+		dbName = "quickpizza-database"
+	}
+	db.AddQueryHook(logging.NewBunSlogHook(slog.Default()))
+	if otel.InstrumentDatabase() {
+		db.AddQueryHook(bunotel.NewQueryHook(
+			bunotel.WithFormattedQueries(true),
+			bunotel.WithDBName(dbName),
+		))
+	}
+	return db, nil
+}
